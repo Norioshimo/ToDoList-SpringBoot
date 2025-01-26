@@ -53,6 +53,11 @@ mvn clean install
 mvn spring-boot:run
 ```
 
+```bash
+Para levantar el proyecto una vez compilado:
+java -jar target/todolist.jar
+```
+
 ---
 
 ## Estructura del proyecto
