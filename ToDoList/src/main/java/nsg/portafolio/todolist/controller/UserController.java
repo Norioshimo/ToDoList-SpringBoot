@@ -2,6 +2,7 @@ package nsg.portafolio.todolist.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "Users API", description = "Endpoints para la gestión de usuarios")
-public class UserController {
+public class UserController implements Serializable{
 
     @Autowired
     private UsersServices usersService;
@@ -46,8 +47,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new ResponseDto(null, "Existe el usuario con el mail " + user.getEmail()));
             }
-
-            user.setFechaCreacion(LocalDateTime.now());
+ 
             Users createdUser = usersService.create(user); // Crear cada usuario
 
             if (createdUser != null) {

@@ -1,22 +1,18 @@
 package nsg.portafolio.todolist.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,36 +23,33 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
-public class Users implements Serializable {
+@Table(name = "tasks")
+public class Tasks implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "users_id")
-    private Integer usersId;
+    @Column(name = "tasks_id")
+    private Integer tasksId;
 
-    @Column(name = "nombre")
-    private String nombre;
+    @Column(name = "titulo")
+    private String titulo;
 
-    @Column(name = "email")
-    private String email;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password")
-    private String password;
+    @Column(name = "descripcion")
+    private String descripcion;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
+    @ManyToOne
+    @JoinColumn(name = "users_id", referencedColumnName = "users_id")
     //permiten manejar relaciones de uno a muchos sin causar ciclos */
-    @OneToMany(mappedBy = "usersId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<Tasks> tareas;
+    @JsonBackReference
+    private Users usersId;
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.usersId);
+        int hash = 3;
+        hash = 17 * hash + Objects.hashCode(this.tasksId);
         return hash;
     }
 
@@ -71,8 +64,8 @@ public class Users implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Users other = (Users) obj;
-        if (!Objects.equals(this.usersId, other.usersId)) {
+        final Tasks other = (Tasks) obj;
+        if (!Objects.equals(this.tasksId, other.tasksId)) {
             return false;
         }
         return true;
@@ -82,5 +75,4 @@ public class Users implements Serializable {
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
     }
-
 }

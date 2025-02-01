@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private TokenService tokenService;
 
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
-            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**",
+            "swagger", "/v3/api-docs", "/webjars/**", 
             "/users/hello", "/users/login", "/users/create", "/users/validate-token"
     );
 
@@ -34,9 +34,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         System.out.println("doFilterInternal");
 
         String path = request.getServletPath();
-        System.out.println("PATH: " + path);
-        if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
-            System.out.println("No validar la ruta");
+        System.out.println("PATH: " + path + " | Validar: " + EXCLUDED_PATHS.contains(path));
+        System.out.println("paths: " + EXCLUDED_PATHS.toString());
+
+        if (EXCLUDED_PATHS.stream().anyMatch(path::contains)) {
+            System.out.println("No validar la ruta " + path);
             filterChain.doFilter(request, response);
             return;
         }

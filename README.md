@@ -48,10 +48,6 @@ server.port=8080
 
 ### 4. Construir y ejecutar el proyecto
 Para compilar y ejecutar el proyecto, use:
-```bash
-mvn clean install
-mvn spring-boot:run
-```
 
 ```bash
 Para levantar el proyecto una vez compilado:
