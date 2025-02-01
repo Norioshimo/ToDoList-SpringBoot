@@ -13,7 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import javax.servlet.http.HttpServletResponse;
+import nsg.portafolio.todolist.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -50,12 +53,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT token is expired " + e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código HTTP 401
-                response.getWriter().write("JWT token is expired " + e);
+                response.getWriter().write("Token expirado");
+                return;
             } catch (Exception e) {
                 System.out.println("Error in JWT token " + e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código HTTP 401
-                response.getWriter().write("Error in JWT token " + e);
+                response.getWriter().write("Error inesperado, vuelva a iniciar sesión. " + e);
+                return;
             }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código HTTP 401
+            response.getWriter().write("Token no envíado en la cabecera. Auth Type. Bearer Token");
+            return;
         }
 
         // Si se encuentra un username en el token, establece la autenticación en el contexto de seguridad
@@ -64,7 +73,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>()));
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Código HTTP 401
-            response.getWriter().write("Invalid or missing token");
+            response.getWriter().write("Token invalido.");
             return; // Detener el procesamiento de la solicitud
         }
 
