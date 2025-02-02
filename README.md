@@ -197,12 +197,6 @@ Y lo serializas en una API REST con Spring Boot, obtendrás una respuesta JSON c
 
 ---
 
-Este documento proporciona una referencia clara sobre la estructura de la paginación en Spring Data JPA y puede ser agregado al `README.md` de tu proyecto. 🚀
-
-
-
----
-
 ## Licencia
 Este proyecto está bajo la licencia [MIT](LICENSE). Puedes usarlo y modificarlo libremente.
 
