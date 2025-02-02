@@ -1,9 +1,11 @@
 package nsg.portafolio.todolist.service.interfaces;
 
 import java.util.List;
-import nsg.portafolio.todolist.dto.LoginDto;
-import nsg.portafolio.todolist.dto.ResponseDto;
+import nsg.portafolio.todolist.dto.LoginDto; 
+import nsg.portafolio.todolist.dto.ResponseWrapper;
 import nsg.portafolio.todolist.model.Users;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IUsersService {
 
@@ -16,10 +18,12 @@ public interface IUsersService {
     Users findByEmail(String email);
 
     List<Users> findAll();
+    
+    Page<Users> findAll(Pageable pageable);
 
     Users delete(Integer id);
 
-    ResponseDto login(LoginDto request);
+    ResponseWrapper login(LoginDto request);
 
     boolean validateToken(String token);
 

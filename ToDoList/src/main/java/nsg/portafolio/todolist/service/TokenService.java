@@ -1,4 +1,4 @@
-package nsg.portafolio.todolist.security;
+package nsg.portafolio.todolist.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

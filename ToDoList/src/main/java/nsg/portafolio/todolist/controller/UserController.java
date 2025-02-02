@@ -3,14 +3,17 @@ package nsg.portafolio.todolist.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import nsg.portafolio.todolist.dto.LoginDto;
-import nsg.portafolio.todolist.dto.ResponseDto;
+import nsg.portafolio.todolist.dto.ResponseWrapper;
+import nsg.portafolio.todolist.model.Tasks;
 import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.service.UsersServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "Users API", description = "Endpoints para la gestión de usuarios")
-public class UserController implements Serializable{
+public class UserController implements Serializable {
 
     @Autowired
     private UsersServices usersService;
@@ -45,21 +48,21 @@ public class UserController implements Serializable{
             if (userExiset != null) {
                 System.out.println("Existe el usuario con el mail " + user.getEmail());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseDto(null, "Existe el usuario con el mail " + user.getEmail()));
+                        .body(new ResponseWrapper<String>("Existe el usuario con el mail " + user.getEmail()));
             }
- 
+
             Users createdUser = usersService.create(user); // Crear cada usuario
 
             if (createdUser != null) {
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdUser); // Devolver la lista de nuevos usuarios
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseDto(null, "Hubo error al crear usuario: " + user.getEmail()));
+                        .body(new ResponseWrapper<String>("Hubo error al crear usuario: " + user.getEmail()));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto(null, "Hubo un error inesperado al procesar el usuario: " + user.getEmail() + ". " + e));
+                    .body(new ResponseWrapper<String>("Hubo un error inesperado al procesar el usuario: " + user.getEmail() + ". " + e));
         }
     }
 
@@ -77,7 +80,7 @@ public class UserController implements Serializable{
             return ResponseEntity.status(HttpStatus.OK).body(users);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(null, "No existe el usuario con el id " + idUsers));
+                    .body(new ResponseWrapper<String>("No existe el usuario con el id " + idUsers));
         }
     }
 
@@ -88,53 +91,56 @@ public class UserController implements Serializable{
             return ResponseEntity.status(HttpStatus.OK).body(users);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(null, "No existe el usuario con el mail " + email));
+                    .body(new ResponseWrapper<String>("No existe el usuario con el mail " + email));
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<?>> findAll() {
-        List<Users> users = usersService.findAll();
-        if (!users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(users);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonList(new ResponseDto(null, "No existe el usuarios")));
-        }
+    public ResponseEntity<Object> findAll(
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+            @RequestParam(name = "offset", defaultValue = "0") Integer offset
+    ) {
+        System.out.println("limit: " + limit + " | offset: " + offset);
+
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        Page<Users> page = this.usersService.findAll(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseDto> delete(@PathVariable("id") Integer idUsers) {
+    public ResponseEntity<ResponseWrapper<String>> delete(@PathVariable("id") Integer idUsers) {
         Users users = usersService.delete(idUsers);
         if (users != null) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseDto(null, "El usuario con id " + idUsers + " se ha eliminado correctamente"));
+                    .body(new ResponseWrapper<String>("El usuario con id " + idUsers + " se ha eliminado correctamente"));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(null, "El usuario no existe"));
+                    .body(new ResponseWrapper<String>("El usuario no existe"));
         }
     }
 
     @PostMapping("/login")
     @Operation(summary = "Authenticar por Usuario y Clave", description = "Devuelve el token")
-    public ResponseEntity<ResponseDto> login(@RequestBody LoginDto request) {
+    public ResponseEntity<Object> login(@RequestBody LoginDto request) {
         // Aquí deberías llamar al servicio que maneja la lógica de autenticación
-        ResponseDto response = usersService.login(request);
+        ResponseWrapper<String> response = usersService.login(request);
 
         if (response != null) {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDto(null, "Credenciales incorrectas."));
+                    .body(new ResponseWrapper<String>("Credenciales incorrectas."));
         }
     }
 
     @GetMapping("/validate-token")
-    public ResponseEntity<ResponseDto> validateToken(@RequestParam(name = "token", defaultValue = "") String token) {
+    public ResponseEntity<ResponseWrapper<String>> validateToken(@RequestParam(name = "token", defaultValue = "") String token) {
 
-        if ("".equals(token)) {
+        if (token.isEmpty()) {
             System.out.println("Token no enviado.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto(null, "token es campo requerido."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseWrapper<String>("token es campo requerido."));
         }
 
         // Validar el token y obtener el correo si es válido
@@ -142,11 +148,11 @@ public class UserController implements Serializable{
 
         if (userEmail != null) {
             // Si el correo no es null, significa que el token es válido
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto(null, "Token válido. Correo: " + userEmail));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper<String>("Token válido. Correo: " + userEmail));
 
         } else {
             // Si el correo es null, el token es inválido
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDto(null, "Token inválido."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseWrapper<String>("Token inválido."));
 
         }
     }

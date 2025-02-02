@@ -13,8 +13,8 @@ Este proyecto es una implementación de autenticación utilizando **JWT (JSON We
 ---
 
 ## Tecnologías utilizadas
-- **Java 1.8 o superior**
-- **Spring Boot 2.7+**
+- **Java 1.8**
+- **Spring Boot 2.7**
 - **Spring Security**
 - **JWT (JSON Web Tokens)**
 - **Maven** para la gestión de dependencias
@@ -25,9 +25,9 @@ Este proyecto es una implementación de autenticación utilizando **JWT (JSON We
 
 ### 1. Requisitos previos
 Asegúrese de tener instalados:
-- **JDK 1.8** o superior
-- **Maven 3.6+**
-- Una herramienta de construcción como **IntelliJ IDEA** o **Eclipse**
+- **JDK 1.8** 
+- **Maven 3.6**
+- Una herramienta de construcción como **IntelliJ IDEA** o **Eclipse** o **Netbeans**
 
 ### 2. Clonar el repositorio
 ```bash
@@ -102,15 +102,104 @@ El proyecto incluye un script para crear la base de datos y las tablas necesaria
 La documentación de la API está disponible en:
 http://localhost:8081/api/swagger-ui/index.html
 
+---
+# Documentación: Paginación en Spring Data JPA
+
+Cuando realizas una consulta paginada en Spring Data JPA, la respuesta devuelta tiene la siguiente estructura JSON:
+
+```json
+{
+    "content": [],
+    "pageable": {
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "pageNumber": 0,
+        "pageSize": 10,
+        "unpaged": false,
+        "paged": true
+    },
+    "last": true,
+    "totalElements": 0,
+    "totalPages": 0,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "numberOfElements": 0,
+    "first": true,
+    "empty": true
+}
+```
+
+## Explicación de los campos
+
+### **1. `content`**
+- Contiene la lista de elementos de la página actual.
+- Si está vacío (`[]`), significa que no hay datos en la página consultada.
+
+### **2. `pageable`** (Información sobre la paginación)
+- **`sort`**: Información sobre el ordenamiento de los datos.
+  - `empty`: `true` si no hay criterios de ordenamiento definidos.
+  - `sorted`: `true` si los datos están ordenados.
+  - `unsorted`: `true` si los datos no están ordenados.
+- **`offset`**: Índice del primer elemento de la página en relación con el total de elementos.
+- **`pageNumber`**: Número de la página actual (empieza desde `0`).
+- **`pageSize`**: Cantidad de elementos por página.
+- **`unpaged`**: `true` si la paginación está deshabilitada.
+- **`paged`**: `true` si la paginación está habilitada.
+
+### **3. `last`**
+- `true` si esta es la última página disponible.
+
+### **4. `totalElements`**
+- Cantidad total de elementos en todas las páginas.
+
+### **5. `totalPages`**
+- Número total de páginas disponibles.
+
+### **6. `size`**
+- Cantidad de elementos que se mostraron en la página actual (igual a `pageSize`).
+
+### **7. `number`**
+- Número de la página actual (basado en `0`).
+
+### **8. `sort`** (Información de ordenamiento aplicada a la página actual)
+- **`empty`**: `true` si no hay ordenamiento.
+- **`sorted`**: `true` si hay ordenamiento aplicado.
+- **`unsorted`**: `true` si no hay ordenamiento aplicado.
+
+### **9. `numberOfElements`**
+- Cantidad de elementos en la página actual.
+
+### **10. `first`**
+- `true` si esta es la primera página.
+
+### **11. `empty`**
+- `true` si la página actual no tiene elementos.
+
+## **Ejemplo de uso en código**
+
+Si llamas a un repositorio paginado en Spring Boot:
+
+```java
+Pageable pageable = PageRequest.of(0, 10);
+Page<MiEntidad> page = miEntidadRepository.findAll(pageable);
+```
+
+Y lo serializas en una API REST con Spring Boot, obtendrás una respuesta JSON con esta estructura.
 
 ---
 
-## Contribuciones
-Las contribuciones son bienvenidas. Para contribuir:
-1. Haga un fork del repositorio.
-2. Cree una rama para su función: `git checkout -b nueva-funcionalidad`.
-3. Realice los cambios y haga commit: `git commit -m "Agrega nueva funcionalidad"`.
-4. Envíe un pull request.
+Este documento proporciona una referencia clara sobre la estructura de la paginación en Spring Data JPA y puede ser agregado al `README.md` de tu proyecto. 🚀
+
+
 
 ---
 

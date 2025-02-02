@@ -5,9 +5,10 @@ import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import nsg.portafolio.todolist.model.Tasks;
 import nsg.portafolio.todolist.repository.TasksRepository;
-import nsg.portafolio.todolist.repository.UsersRepository;
 import nsg.portafolio.todolist.service.interfaces.ITasksService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,9 +16,6 @@ public class TasksServices implements ITasksService {
 
     @Autowired
     private TasksRepository tasksRepository;
-
-    @Autowired
-    private UsersRepository usersRepository;
 
     @Override
     public Tasks create(Tasks tasks) {
@@ -55,6 +53,11 @@ public class TasksServices implements ITasksService {
     }
 
     @Override
+    public Page<Tasks> findAll(Pageable pageable) {
+        return tasksRepository.findAll(pageable);
+    }
+
+    @Override
     public Tasks delete(Integer id) {
         Optional<Tasks> tasksOptional = tasksRepository.findById(id);
         if (tasksOptional.isPresent()) {
@@ -64,4 +67,5 @@ public class TasksServices implements ITasksService {
         }
         return null;
     }
+
 }

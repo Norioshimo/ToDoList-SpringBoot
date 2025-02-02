@@ -2,15 +2,16 @@ package nsg.portafolio.todolist.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
 import javax.persistence.EntityNotFoundException;
-import nsg.portafolio.todolist.dto.ResponseDto;
+import nsg.portafolio.todolist.dto.ResponseWrapper;
 import nsg.portafolio.todolist.model.Tasks;
 import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.service.TasksServices;
 import nsg.portafolio.todolist.service.UsersServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,7 +41,7 @@ public class TasksController implements Serializable {
 
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDto(null, "El usuario especificado no existe."));
+                    .body(new ResponseWrapper<String>("El usuario especificado no existe."));
         }
 
         task.setUsersId(usuario);
@@ -51,7 +52,7 @@ public class TasksController implements Serializable {
             return ResponseEntity.status(HttpStatus.CREATED).body(newTasks);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseDto(null, "Hubo un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde."));
+                    .body(new ResponseWrapper<String>("Hubo un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde."));
         }
     }
 
@@ -61,9 +62,9 @@ public class TasksController implements Serializable {
             Tasks updatedTask = tasksService.update(tasks);
             return new ResponseEntity<>(updatedTask, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(new ResponseDto(null, e.getMessage()), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseWrapper<String>(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseDto(null, e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseWrapper<String>(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -74,19 +75,22 @@ public class TasksController implements Serializable {
             return ResponseEntity.status(HttpStatus.OK).body(tasks);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(null, "No se encontró ninguna tarea con el ID proporcionado."));
+                    .body(new ResponseWrapper<String>("No se encontró ninguna tarea con el ID proporcionado."));
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<?>> findAll() {
-        List<Tasks> tasks = tasksService.findAll();
-        if (!tasks.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(tasks);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonList(new ResponseDto(null, "No se encontraron tareas")));
-        }
+    public ResponseEntity<Object> findAll(
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+            @RequestParam(name = "offset", defaultValue = "0") Integer offset
+    ) {
+        System.out.println("limit: " + limit + " | offset: " + offset);
+
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        Page<Tasks> page = this.tasksService.findAll(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
@@ -94,10 +98,10 @@ public class TasksController implements Serializable {
         Tasks tasks = tasksService.delete(idTasks);
         if (tasks != null) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseDto(null, "La tarea con id " + idTasks + " se ha eliminado correctamente"));
+                    .body(new ResponseWrapper<String>("La tarea con id " + idTasks + " se ha eliminado correctamente"));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseDto(null, "La tarea no existe"));
+                    .body(new ResponseWrapper<String>("La tarea no existe"));
         }
     }
 

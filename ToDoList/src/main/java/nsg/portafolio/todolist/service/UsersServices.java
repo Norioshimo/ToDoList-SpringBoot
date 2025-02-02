@@ -3,12 +3,13 @@ package nsg.portafolio.todolist.service;
 import java.util.List;
 import java.util.Optional;
 import nsg.portafolio.todolist.dto.LoginDto;
-import nsg.portafolio.todolist.dto.ResponseDto;
+import nsg.portafolio.todolist.dto.ResponseWrapper;
 import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.repository.UsersRepository;
-import nsg.portafolio.todolist.security.TokenService;
 import nsg.portafolio.todolist.service.interfaces.IUsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,11 @@ public class UsersServices implements IUsersService {
     }
 
     @Override
+    public Page<Users> findAll(Pageable pageable) {
+        return usersRepository.findAll(pageable);
+    }
+
+    @Override
     public Users delete(Integer id) {
         Optional<Users> usersOptional = usersRepository.findById(id);
         if (usersOptional.isPresent()) {
@@ -59,7 +65,7 @@ public class UsersServices implements IUsersService {
     }
 
     @Override
-    public ResponseDto login(LoginDto request) {
+    public ResponseWrapper<String> login(LoginDto request) {
         // 1. Obtener el usuario por email
         Users users = usersRepository.findByEmail(request.getEmail());
 
@@ -68,8 +74,9 @@ public class UsersServices implements IUsersService {
             // 3. Generar un token (puedes usar JWT u otra estrategia)
             String token = tokenService.generateToken(users); // Implementa este método para generar el token
 
+            System.out.println("Login con existo. Token: "+token);
             // 4. Crear y devolver la respuesta de login
-            return new ResponseDto(token, "Login successful");
+            return new ResponseWrapper<String>(token, "Login successful");
         }
 //        // 5. Devolver null o lanzar una excepción si la autenticación falla
         return null;
