@@ -3,11 +3,9 @@ package nsg.portafolio.todolist.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
+import javax.validation.Valid;
 import nsg.portafolio.todolist.dto.LoginDto;
 import nsg.portafolio.todolist.dto.ResponseWrapper;
-import nsg.portafolio.todolist.model.Tasks;
 import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.service.UsersServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,7 @@ public class UserController implements Serializable {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody Users user) {
+    public ResponseEntity<Object> create(@RequestBody @Valid Users user) {
 
         try {
             Users userExiset = usersService.findByEmail(user.getEmail());
@@ -67,7 +65,7 @@ public class UserController implements Serializable {
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody Users users) {
+    public ResponseEntity<Object> update(@RequestBody @Valid Users users) {
         usersService.update(users);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -123,7 +121,7 @@ public class UserController implements Serializable {
 
     @PostMapping("/login")
     @Operation(summary = "Authenticar por Usuario y Clave", description = "Devuelve el token")
-    public ResponseEntity<Object> login(@RequestBody LoginDto request) {
+    public ResponseEntity<Object> login(@RequestBody @Valid LoginDto request) {
         // Aquí deberías llamar al servicio que maneja la lógica de autenticación
         ResponseWrapper<String> response = usersService.login(request);
 

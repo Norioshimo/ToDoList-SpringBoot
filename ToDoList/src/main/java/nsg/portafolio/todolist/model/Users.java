@@ -16,6 +16,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,9 +39,13 @@ public class Users implements Serializable {
     private Integer usersId;
 
     @Column(name = "nombre")
+    @NotBlank(message = "El Nombre es requerido.") 
+    @Size(max = 100)
     private String nombre;
 
     @Column(name = "email")
+    @NotNull(message = "El Email es requerido.")
+    @Size(max = 100)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
