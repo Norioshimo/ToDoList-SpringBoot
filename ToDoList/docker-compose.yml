@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  todolist_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: todolist_app
+    image: todolist_app
+    ports:
+      - "8081:8081"
+    restart: always
+    networks:
+      - todolist_network
+
+  db:
+    container_name: ${POSTGRES_DB_NAME}
+    image: postgres:16.3
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - todolist_network
+ 
+networks:
+  todolist_network:
+    driver: bridge

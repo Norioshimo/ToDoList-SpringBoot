@@ -1,0 +1,20 @@
+ 
+# IMAGEN 
+FROM eclipse-temurin:8u452-b09-jdk  as build
+
+# DEFINIR DIRECTORIO DE TRABAJO
+WORKDIR /usr/src/app
+
+# COPIAR Y PEGAR ACHIVOS DENTRO DEL CONTENEDOR
+COPY . .
+
+# DESCARGAR LAS DEPENDENCIAS
+RUN ./mvnw dependency:go-offline
+
+# CONSTRUIR EL PROYECTO
+RUN ./mvnw package -DskipTests
+
+
+# LEVANTAR EL PROYECTO
+ENTRYPOINT [ "java","-jar","./target/todolist.jar" ]
+ 

@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor 
 public class TaskCreateDto {
 
+    
     private String titulo;
 
     private String descripcion;

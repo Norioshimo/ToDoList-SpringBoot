@@ -1,0 +1,14 @@
+
+target/
+
+.dockerignore
+.gitattributes
+.gitignore
+.env
+.env.template
+
+nbactions.xml
+
+Dockerfile.dev
+
+postgres/
