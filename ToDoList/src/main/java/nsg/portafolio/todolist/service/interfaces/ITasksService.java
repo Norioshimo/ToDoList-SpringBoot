@@ -3,11 +3,12 @@ package nsg.portafolio.todolist.service.interfaces;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
+import nsg.portafolio.todolist.dto.TaskCreateDto;
 import nsg.portafolio.todolist.model.Tasks;
 
 public interface ITasksService {
 
-    Tasks create(Tasks tasks);
+    Tasks create(TaskCreateDto taskCreateDto);
 
     Tasks update(Tasks tasks);
 

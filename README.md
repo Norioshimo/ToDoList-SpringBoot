@@ -21,6 +21,11 @@ Este proyecto es una implementación de autenticación utilizando **JWT (JSON We
 
 ---
 
+## Librerias y Sitio
+- https://projectlombok.org/setup/maven
+- https://devops.datenkollektiv.de/banner.txt/index.html
+---
+
 ## Configuración del proyecto
 
 ### 1. Requisitos previos

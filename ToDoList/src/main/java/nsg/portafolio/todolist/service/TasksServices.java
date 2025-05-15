@@ -3,7 +3,9 @@ package nsg.portafolio.todolist.service;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
+import nsg.portafolio.todolist.dto.TaskCreateDto;
 import nsg.portafolio.todolist.model.Tasks;
+import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.repository.TasksRepository;
 import nsg.portafolio.todolist.service.interfaces.ITasksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,16 @@ public class TasksServices implements ITasksService {
     private TasksRepository tasksRepository;
 
     @Override
-    public Tasks create(Tasks tasks) {
-        return tasksRepository.save(tasks);
+    public Tasks create(TaskCreateDto taskCreateDto) {
+        Tasks t = new Tasks();
+        t.setDescripcion(taskCreateDto.getDescripcion());
+        t.setTitulo(taskCreateDto.getTitulo());
+
+        Users u = new Users();
+        u.setUsersId(taskCreateDto.getUserId());
+        t.setUsersId(u);
+
+        return tasksRepository.save(t);
     }
 
     @Override

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.Serializable;
 import javax.persistence.EntityNotFoundException;
 import nsg.portafolio.todolist.dto.ResponseWrapper;
+import nsg.portafolio.todolist.dto.TaskCreateDto;
 import nsg.portafolio.todolist.model.Tasks;
 import nsg.portafolio.todolist.model.Users;
 import nsg.portafolio.todolist.service.TasksServices;
@@ -36,20 +37,19 @@ public class TasksController implements Serializable {
     private UsersServices usersService;
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Tasks task, @RequestParam Integer userId) {
-        Users usuario = usersService.findById(userId);
+    public ResponseEntity<?> create(@RequestBody TaskCreateDto taskCreateDto) {
+        System.out.println("idUser: "+taskCreateDto.getUserId());
+        Users usuario = usersService.findById(taskCreateDto.getUserId());
 
         if (usuario == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseWrapper<String>("El usuario especificado no existe."));
         }
-
-        task.setUsersId(usuario);
-
-        Tasks newTasks = tasksService.create(task);
+        
+        Tasks newTasks = tasksService.create(taskCreateDto);
 
         if (newTasks != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(newTasks);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper<Tasks>(newTasks, "Creado con éxito"));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseWrapper<String>("Hubo un error al procesar su solicitud. Por favor, inténtelo de nuevo más tarde."));
@@ -57,10 +57,11 @@ public class TasksController implements Serializable {
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody Tasks tasks) {
+    public ResponseEntity<?> update(@RequestBody Tasks tasks) {
         try {
             Tasks updatedTask = tasksService.update(tasks);
-            return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+            
+            return new ResponseEntity<>(new ResponseWrapper<Tasks>(updatedTask, "Actualizado con éxito"), HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(new ResponseWrapper<String>(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -80,7 +81,7 @@ public class TasksController implements Serializable {
     }
 
     @GetMapping
-    public ResponseEntity<Object> findAll(
+    public ResponseEntity<?> findAll(
             @RequestParam(name = "limit", defaultValue = "10") Integer limit,
             @RequestParam(name = "offset", defaultValue = "0") Integer offset
     ) {
@@ -89,12 +90,11 @@ public class TasksController implements Serializable {
         Pageable pageable = PageRequest.of(offset, limit);
 
         Page<Tasks> page = this.tasksService.findAll(pageable);
-
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") Integer idTasks) {
+    public ResponseEntity<?> delete(@PathVariable("id") Integer idTasks) {
         Tasks tasks = tasksService.delete(idTasks);
         if (tasks != null) {
             return ResponseEntity.status(HttpStatus.OK)

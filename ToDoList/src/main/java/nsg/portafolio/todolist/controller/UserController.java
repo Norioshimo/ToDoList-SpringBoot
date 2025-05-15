@@ -38,7 +38,7 @@ public class UserController implements Serializable {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody @Valid Users user) {
+    public ResponseEntity<?> create(@RequestBody @Valid Users user) {
 
         try {
             Users userExiset = usersService.findByEmail(user.getEmail());
@@ -65,7 +65,7 @@ public class UserController implements Serializable {
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody @Valid Users users) {
+    public ResponseEntity<?> update(@RequestBody @Valid Users users) {
         usersService.update(users);
         return new ResponseEntity<>(HttpStatus.OK);
     }
