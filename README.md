@@ -18,12 +18,21 @@ Este proyecto es una implementación de autenticación utilizando **JWT (JSON We
 - **Spring Security**
 - **JWT (JSON Web Tokens)**
 - **Maven** para la gestión de dependencias
+- **SWAGGER**. https://springdoc.org/
 
 ---
 
 ## Librerias y Sitio
 - https://projectlombok.org/setup/maven
 - https://devops.datenkollektiv.de/banner.txt/index.html
+---
+
+---
+## Docker
+- Para crear imagen corriendo dockerfile.dev
+docker build -f Dockerfile.dev -t pruebadocker .
+- Para correr el docker compose
+docker compose up --build -d
 ---
 
 ## Configuración del proyecto
